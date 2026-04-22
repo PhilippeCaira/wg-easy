@@ -35,9 +35,12 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql (https://github.com/nitrojs/nitro/issues/3328)
+# Fork OIDC : --cache /tmp/npm-cache contourne un bug npm 11 dans le runner
+# GH (internal/oserror fsTop) quand le cache par défaut /root/.npm n'est
+# pas accessible en écriture pendant le layer RUN.
 RUN cd /app/server && \
-    npm install --no-save --omit=dev libsql && \
-    npm cache clean --force
+    npm install --cache /tmp/npm-cache --no-save --omit=dev libsql && \
+    rm -rf /tmp/npm-cache
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
