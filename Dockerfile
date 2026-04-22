@@ -35,12 +35,12 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql (https://github.com/nitrojs/nitro/issues/3328)
-# Fork OIDC : --cache /tmp/npm-cache contourne un bug npm 11 dans le runner
-# GH (internal/oserror fsTop) quand le cache par défaut /root/.npm n'est
-# pas accessible en écriture pendant le layer RUN.
+# Fork OIDC : npm 11 a un bug fsTop sur les install natifs dans Docker.
+# Downgrade à npm 10 juste pour l'install libsql résout le problème.
+RUN npm install -g npm@10
 RUN cd /app/server && \
-    npm install --cache /tmp/npm-cache --no-save --omit=dev libsql && \
-    rm -rf /tmp/npm-cache
+    npm install --no-save --omit=dev libsql && \
+    npm cache clean --force
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
