@@ -35,12 +35,12 @@ COPY --from=build /app/.output /app
 # Copy migrations
 COPY --from=build /app/server/database/migrations /app/server/database/migrations
 # libsql (https://github.com/nitrojs/nitro/issues/3328)
-# Fork OIDC : npm 11 a un bug fsTop sur les install natifs dans Docker.
-# Downgrade à npm 10 juste pour l'install libsql résout le problème.
-RUN npm install -g npm@10
+# Fork OIDC : npm 11 a un bug fsTop (github.com/npm/cli/issues/8036).
+# Utiliser pnpm pour l'install libsql contourne le bug.
+RUN corepack enable pnpm
 RUN cd /app/server && \
-    npm install --no-save --omit=dev libsql && \
-    npm cache clean --force
+    pnpm add --prod --ignore-workspace libsql && \
+    pnpm store prune
 # cli
 COPY --from=build /app/cli/cli.sh /usr/local/bin/cli
 RUN chmod +x /usr/local/bin/cli
