@@ -70,6 +70,15 @@
 const toast = useToast();
 const { t } = useI18n();
 
+// Auto-redirect vers Zitadel si OIDC activé (flag injecté au build + runtime config)
+const { public: pub } = useRuntimeConfig();
+if (import.meta.client && (pub as { oidcEnabled?: boolean }).oidcEnabled) {
+  const qs = new URLSearchParams(window.location.search);
+  if (qs.get('local') !== '1') {
+    window.location.replace('/api/auth/oidc/start');
+  }
+}
+
 const authenticating = ref(false);
 const remember = ref(false);
 const username = ref<string>('');

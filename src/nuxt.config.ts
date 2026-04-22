@@ -2,6 +2,13 @@ import { fileURLToPath } from 'node:url';
 
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
+  runtimeConfig: {
+    public: {
+      // Quand true, login.vue auto-redirige vers /api/auth/oidc/start.
+      // Surchargeable au runtime via env NUXT_PUBLIC_OIDC_ENABLED=true.
+      oidcEnabled: process.env.OIDC_ENABLED === 'true',
+    },
+  },
   future: {
     compatibilityVersion: 4,
   },
